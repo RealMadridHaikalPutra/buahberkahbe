@@ -3,7 +3,7 @@ import z from "zod";
 export const createExpenseSchema = z.object({
   stallId: z.number(),
   category: z.string().min(1, "Category is required"),
-  amount: z.number().positive("Amount must be positive").transform(v => v.toString()),
+  amount: z.number().int().positive("Amount must be positive"),
   description: z.string().optional(),
   createdBy: z.number(),
 });
@@ -11,7 +11,7 @@ export const createExpenseSchema = z.object({
 export const createCashflowSchema = z.object({
   stallId: z.number().optional(),
   type: z.enum(['income', 'expense']),
-  amount: z.number().positive("Amount must be positive").transform(v => v.toString()),
+  amount: z.number().int().positive("Amount must be positive"),
   sourceType: z.enum(['sales', 'expenses', 'salary_payments', 'supplier_orders', 'manual']),
   sourceId: z.number().optional(),
   description: z.string().optional(),

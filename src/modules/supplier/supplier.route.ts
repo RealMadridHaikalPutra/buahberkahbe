@@ -19,17 +19,7 @@ export async function supplierRoutes(app: FastifyInstance) {
   app.get('/supplier-orders', controller.getSupplierOrders.bind(controller));
   app.get('/supplier-orders/:id', controller.getSupplierOrderById.bind(controller));
   app.get('/supplier-orders/:orderId/items', controller.getOrderItems.bind(controller));
-  app.get('/supplier-orders/:orderId/deliveries', controller.getDeliveriesByOrderId.bind(controller));
   app.post('/supplier-orders', controller.createSupplierOrder.bind(controller));
   app.patch('/supplier-orders/:id', controller.updateSupplierOrder.bind(controller));
-
-  // Supplier Order Items
-  app.post('/supplier-order-items', controller.createSupplierOrderItem.bind(controller));
-
-  // Supplier Deliveries
-  app.post('/supplier-deliveries', controller.createSupplierDelivery.bind(controller));
-
-  // Supplier Delivery Items
-  app.get('/supplier-deliveries/:deliveryId/items', controller.getDeliveryItems.bind(controller));
-  app.post('/supplier-delivery-items', controller.createSupplierDeliveryItem.bind(controller));
+  app.patch('/supplier-order-items/:id', controller.updateOrderItem.bind(controller));
 }

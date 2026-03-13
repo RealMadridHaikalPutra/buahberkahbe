@@ -3,7 +3,7 @@ import z from "zod";
 export const createInventorySchema = z.object({
   stallId: z.number(),
   variantId: z.number(),
-  quantity: z.number().min(0, "Quantity cannot be negative").default(0).transform(v => v.toString()),
+  quantity: z.number().int().min(0, "Quantity cannot be negative").default(0),
 });
 
 export const createInventoryMutationSchema = z.object({
@@ -16,11 +16,11 @@ export const createInventoryMutationItemSchema = z.object({
   mutationId: z.number(),
   variantId: z.number(),
   unitId: z.number(),
-  quantity: z.number().positive("Quantity must be positive").transform(v => v.toString()),
+  quantity: z.number().int().positive("Quantity must be positive"),
 });
 
 export const updateInventorySchema = z.object({
-  quantity: z.number().min(0, "Quantity cannot be negative").transform(v => v.toString()),
+  quantity: z.number().int().min(0, "Quantity cannot be negative"),
 });
 
 // ─── Inferred Types ───────────────────────────────────────────────────────────

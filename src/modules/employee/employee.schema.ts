@@ -5,12 +5,12 @@ export const createEmployeeSchema = z.object({
   type: z.enum(['stall_worker', 'loader']),
   stallId: z.number(),
   salaryType: z.enum(['monthly', 'daily', 'weekly']),
-  salaryAmount: z.number().positive("Salary amount must be positive").transform(v => v.toString()),
+  salaryAmount: z.number().int().positive("Salary amount must be positive"),
 });
 
 export const createSalaryPaymentSchema = z.object({
   employeeId: z.number(),
-  amount: z.number().positive("Amount must be positive").transform(v => v.toString()),
+  amount: z.number().int().positive("Amount must be positive"),
   paymentDate: z.string().min(1, "Payment date is required"),
   note: z.string().optional(),
 });

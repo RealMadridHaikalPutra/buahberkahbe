@@ -2,7 +2,6 @@ import {
   pgTable,
   serial,
   integer,
-  numeric,
   timestamp,
   varchar,
   pgEnum,
@@ -27,7 +26,7 @@ export const sales = pgTable('sales', {
     .notNull()
     .references(() => users.id, { onDelete: 'restrict' }),
   saleType: saleTypeEnum('sale_type').notNull(),
-  totalAmount: numeric('total_amount', { precision: 15, scale: 2 }).notNull(),
+  totalAmount: integer('total_amount').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
@@ -44,9 +43,9 @@ export const saleItems = pgTable('sale_items', {
   unitId: integer('unit_id')
     .notNull()
     .references(() => units.id, { onDelete: 'restrict' }),
-  quantity: numeric('quantity', { precision: 15, scale: 3 }).notNull(),
-  price: numeric('price', { precision: 15, scale: 2 }).notNull(),
-  subtotal: numeric('subtotal', { precision: 15, scale: 2 }).notNull(),
+  quantity: integer('quantity').notNull(),
+  price: integer('price').notNull(),
+  subtotal: integer('subtotal').notNull(),
 });
 
 // ─── Types ────────────────────────────────────────────────────────────────────

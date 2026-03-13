@@ -2,7 +2,6 @@ import {
   pgTable,
   serial,
   integer,
-  numeric,
   timestamp,
   unique,
 } from 'drizzle-orm/pg-core';
@@ -23,9 +22,7 @@ export const inventories = pgTable(
     variantId: integer('variant_id')
       .notNull()
       .references(() => productVariants.id, { onDelete: 'restrict' }),
-    quantity: numeric('quantity', { precision: 15, scale: 3 })
-      .notNull()
-      .default('0'),
+    quantity: integer('quantity').notNull().default(0),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
   },
   (t) => [unique('uq_inventory_stall_variant').on(t.stallId, t.variantId)],
@@ -60,7 +57,7 @@ export const inventoryMutationItems = pgTable('inventory_mutation_items', {
   unitId: integer('unit_id')
     .notNull()
     .references(() => units.id, { onDelete: 'restrict' }),
-  quantity: numeric('quantity', { precision: 15, scale: 3 }).notNull(),
+  quantity: integer('quantity').notNull(),
 });
 
 // ─── Types ────────────────────────────────────────────────────────────────────

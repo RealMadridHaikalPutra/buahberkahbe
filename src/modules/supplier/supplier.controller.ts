@@ -58,42 +58,15 @@ export class SupplierController {
     return reply.send(order);
   }
 
-  // ─── Supplier Order Items ─────────────────────────────────────────────────────
-
-  async createSupplierOrderItem(req: FastifyRequest, reply: FastifyReply) {
-    const item = await this.service.createSupplierOrderItem(req.body);
-    return reply.status(201).send(item);
+  async updateOrderItem(req: FastifyRequest, reply: FastifyReply) {
+    const { id } = req.params as { id: string };
+    const item = await this.service.updateSupplierOrderItem(Number(id), req.body);
+    return reply.send(item);
   }
 
   async getOrderItems(req: FastifyRequest, reply: FastifyReply) {
     const { orderId } = req.params as { orderId: string };
     const items = await this.service.getItemsByOrderId(Number(orderId));
-    return reply.send(items);
-  }
-
-  // ─── Supplier Deliveries ──────────────────────────────────────────────────────
-
-  async createSupplierDelivery(req: FastifyRequest, reply: FastifyReply) {
-    const delivery = await this.service.createSupplierDelivery(req.body);
-    return reply.status(201).send(delivery);
-  }
-
-  async getDeliveriesByOrderId(req: FastifyRequest, reply: FastifyReply) {
-    const { orderId } = req.params as { orderId: string };
-    const deliveries = await this.service.getDeliveriesByOrderId(Number(orderId));
-    return reply.send(deliveries);
-  }
-
-  // ─── Supplier Delivery Items ───────────────────────────────────────────────────
-
-  async createSupplierDeliveryItem(req: FastifyRequest, reply: FastifyReply) {
-    const item = await this.service.createSupplierDeliveryItem(req.body);
-    return reply.status(201).send(item);
-  }
-
-  async getDeliveryItems(req: FastifyRequest, reply: FastifyReply) {
-    const { deliveryId } = req.params as { deliveryId: string };
-    const items = await this.service.getDeliveryItemsByDeliveryId(Number(deliveryId));
     return reply.send(items);
   }
 }

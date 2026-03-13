@@ -4,16 +4,16 @@ export const createSaleSchema = z.object({
   stallId: z.number(),
   createdBy: z.number(),
   saleType: z.enum(['retail', 'wholesale']),
-  totalAmount: z.number().positive("Total amount must be positive").transform(v => v.toString()),
+  totalAmount: z.number().int().positive("Total amount must be positive"),
 });
 
 export const createSaleItemSchema = z.object({
   saleId: z.number(),
   variantId: z.number(),
   unitId: z.number(),
-  quantity: z.number().positive("Quantity must be positive").transform(v => v.toString()),
-  price: z.number().positive("Price must be positive").transform(v => v.toString()),
-  subtotal: z.number().positive("Subtotal must be positive").transform(v => v.toString()),
+  quantity: z.number().int().positive("Quantity must be positive"),
+  price: z.number().int().positive("Price must be positive"),
+  subtotal: z.number().int().positive("Subtotal must be positive"),
 });
 
 export const updateSaleSchema = createSaleSchema.partial();

@@ -1,6 +1,6 @@
 import { ProductRepository } from "./product.repository";
 import {
-  createProductSchema,
+  createProductFullSchema,
   createProductVariantSchema,
   createUnitSchema,
   createProductPriceSchema,
@@ -8,7 +8,7 @@ import {
   updateProductVariantSchema,
   updateUnitSchema,
   updateProductPriceSchema,
-  type CreateProductInput,
+  type CreateProductFullInput,
   type CreateProductVariantInput,
   type CreateUnitInput,
   type CreateProductPriceInput,
@@ -32,9 +32,25 @@ export class ProductService {
   // ─── Products ─────────────────────────────────
 
   async createProduct(data: unknown): Promise<Product> {
-    const parsed: CreateProductInput = createProductSchema.parse(data);
-    const product = await this.repo.createProduct(parsed);
+    const parsed: CreateProductFullInput = createProductFullSchema.parse(data);
+    const { variants, ...productData } = parsed;
+
+    const product = await this.repo.createProduct(productData);
     if (!product) throw new Error("Failed to create product");
+
+    for (const v of variants) {
+      const { prices, stocks, ...variantData } = v;
+      const variant = await this.repo.createProductVariant({ ...variantData, productId: product.id, active: 1 });
+      if (!variant) continue;
+
+      for (const p of prices) {
+        await this.repo.createProductPrice({ variantId: variant.id, unitId: p.unitId, price: p.price });
+      }
+      for (const s of stocks) {
+        await this.repo.createInventory({ stallId: s.stallId, variantId: variant.id, quantity: Number(s.quantity) });
+      }
+    }
+
     return product;
   }
 

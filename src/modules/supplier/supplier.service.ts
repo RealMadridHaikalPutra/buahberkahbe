@@ -3,24 +3,18 @@ import {
   createSupplierSchema,
   updateSupplierSchema,
   createSupplierOrderSchema,
+  updateSupplierOrderItemSchema,
   updateSupplierOrderSchema,
-  createSupplierOrderItemSchema,
-  createSupplierDeliverySchema,
-  createSupplierDeliveryItemSchema,
   type CreateSupplierInput,
   type UpdateSupplierInput,
   type CreateSupplierOrderInput,
+  type UpdateSupplierOrderItemInput,
   type UpdateSupplierOrderInput,
-  type CreateSupplierOrderItemInput,
-  type CreateSupplierDeliveryInput,
-  type CreateSupplierDeliveryItemInput,
 } from './supplier.schema';
 import type {
   Supplier,
   SupplierOrder,
   SupplierOrderItem,
-  SupplierDelivery,
-  SupplierDeliveryItem,
 } from '../../database/schema/suppliers';
 
 export class SupplierService {
@@ -56,8 +50,20 @@ export class SupplierService {
 
   async createSupplierOrder(data: unknown): Promise<SupplierOrder> {
     const parsed: CreateSupplierOrderInput = createSupplierOrderSchema.parse(data);
-    const order = await this.repo.createSupplierOrder(parsed);
+    const { items, ...orderData } = parsed;
+    const order = await this.repo.createSupplierOrder(orderData);
     if (!order) throw new Error('Failed to create supplier order');
+
+    for (const item of items) {
+      await this.repo.createSupplierOrderItem({
+        orderId: order.id,
+        variantId: item.variantId,
+        unitId: item.unitId,
+        quantity: item.quantity,
+        price: item.price,
+      });
+    }
+
     return order;
   }
 
@@ -82,42 +88,14 @@ export class SupplierService {
     return order;
   }
 
-  // ─── Supplier Order Items ─────────────────────────────────────────────────────
-
-  async createSupplierOrderItem(data: unknown): Promise<SupplierOrderItem> {
-    const parsed: CreateSupplierOrderItemInput = createSupplierOrderItemSchema.parse(data);
-    const item = await this.repo.createSupplierOrderItem(parsed);
-    if (!item) throw new Error('Failed to create order item');
+  async updateSupplierOrderItem(id: number, data: unknown): Promise<SupplierOrderItem> {
+    const parsed: UpdateSupplierOrderItemInput = updateSupplierOrderItemSchema.parse(data);
+    const item = await this.repo.updateSupplierOrderItem(id, parsed);
+    if (!item) throw new Error('Supplier order item not found');
     return item;
   }
 
   async getItemsByOrderId(orderId: number): Promise<SupplierOrderItem[]> {
     return this.repo.getItemsByOrderId(orderId);
-  }
-
-  // ─── Supplier Deliveries ──────────────────────────────────────────────────────
-
-  async createSupplierDelivery(data: unknown): Promise<SupplierDelivery> {
-    const parsed: CreateSupplierDeliveryInput = createSupplierDeliverySchema.parse(data);
-    const delivery = await this.repo.createSupplierDelivery(parsed);
-    if (!delivery) throw new Error('Failed to create delivery');
-    return delivery;
-  }
-
-  async getDeliveriesByOrderId(orderId: number): Promise<SupplierDelivery[]> {
-    return this.repo.getDeliveriesByOrderId(orderId);
-  }
-
-  // ─── Supplier Delivery Items ───────────────────────────────────────────────────
-
-  async createSupplierDeliveryItem(data: unknown): Promise<SupplierDeliveryItem> {
-    const parsed: CreateSupplierDeliveryItemInput = createSupplierDeliveryItemSchema.parse(data);
-    const item = await this.repo.createSupplierDeliveryItem(parsed);
-    if (!item) throw new Error('Failed to create delivery item');
-    return item;
-  }
-
-  async getDeliveryItemsByDeliveryId(deliveryId: number): Promise<SupplierDeliveryItem[]> {
-    return this.repo.getDeliveryItemsByDeliveryId(deliveryId);
   }
 }

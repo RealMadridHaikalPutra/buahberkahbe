@@ -11,6 +11,7 @@ import type {
   NewUnit,
   NewProductPrice,
 } from '../../database/schema/products';
+import { inventories } from '../../database/schema/inventory';
 import type { Database } from '../../plugins/drizzle';
 
 export class ProductRepository {
@@ -114,5 +115,12 @@ async updateUnit(id: number, data: Partial<NewUnit>) {
       .select()
       .from(productPrices)
       .where(eq(productPrices.variantId, variantId));
+  }
+
+  // ─── Inventory (used during full product creation) ─────────────────────────
+
+  async createInventory(data: { stallId: number; variantId: number; quantity: number }) {
+    const [inv] = await this.db.insert(inventories).values(data).returning();
+    return inv;
   }
 }

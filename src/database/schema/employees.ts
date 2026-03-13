@@ -3,7 +3,6 @@ import {
   serial,
   varchar,
   integer,
-  numeric,
   timestamp,
   date,
   text,
@@ -35,7 +34,7 @@ export const employees = pgTable('employees', {
     .notNull()
     .references(() => stalls.id, { onDelete: 'restrict' }),
   salaryType: salaryTypeEnum('salary_type').notNull(),
-  salaryAmount: numeric('salary_amount', { precision: 15, scale: 2 }).notNull(),
+  salaryAmount: integer('salary_amount').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
@@ -46,7 +45,7 @@ export const salaryPayments = pgTable('salary_payments', {
   employeeId: integer('employee_id')
     .notNull()
     .references(() => employees.id, { onDelete: 'restrict' }),
-  amount: numeric('amount', { precision: 15, scale: 2 }).notNull(),
+  amount: integer('amount').notNull(),
   paymentDate: date('payment_date').notNull(),
   note: text('note'),
 });

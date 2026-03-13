@@ -4,14 +4,12 @@ import {
   varchar,
   text,
   integer,
-  numeric,
   timestamp,
   date,
   pgEnum,
 } from 'drizzle-orm/pg-core';
 import type { InferSelectModel, InferInsertModel } from 'drizzle-orm';
 import { users } from './user';
-import { stalls } from './stalls';
 import { productVariants, units } from './products';
 
 // ─── Enums ────────────────────────────────────────────────────────────────────
@@ -62,39 +60,8 @@ export const supplierOrderItems = pgTable('supplier_order_items', {
   unitId: integer('unit_id')
     .notNull()
     .references(() => units.id, { onDelete: 'restrict' }),
-  quantity: numeric('quantity', { precision: 15, scale: 3 }).notNull(),
-  price: numeric('price', { precision: 15, scale: 2 }).notNull(),
-});
-
-// ─── Supplier Deliveries ──────────────────────────────────────────────────────
-
-export const supplierDeliveries = pgTable('supplier_deliveries', {
-  id: serial('id').primaryKey(),
-  orderId: integer('order_id')
-    .notNull()
-    .references(() => supplierOrders.id, { onDelete: 'restrict' }),
-  deliveryDate: date('delivery_date').notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-});
-
-// ─── Supplier Delivery Items ──────────────────────────────────────────────────
-
-export const supplierDeliveryItems = pgTable('supplier_delivery_items', {
-  id: serial('id').primaryKey(),
-  deliveryId: integer('delivery_id')
-    .notNull()
-    .references(() => supplierDeliveries.id, { onDelete: 'cascade' }),
-  stallId: integer('stall_id')
-    .notNull()
-    .references(() => stalls.id, { onDelete: 'restrict' }),
-  variantId: integer('variant_id')
-    .notNull()
-    .references(() => productVariants.id, { onDelete: 'restrict' }),
-  unitId: integer('unit_id')
-    .notNull()
-    .references(() => units.id, { onDelete: 'restrict' }),
-  quantity: numeric('quantity', { precision: 15, scale: 3 }).notNull(),
-  price: numeric('price', { precision: 15, scale: 2 }).notNull(),
+  quantity: integer('quantity').notNull(),
+  price: integer('price').notNull(),
 });
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -107,9 +74,3 @@ export type NewSupplierOrder = InferInsertModel<typeof supplierOrders>;
 
 export type SupplierOrderItem = InferSelectModel<typeof supplierOrderItems>;
 export type NewSupplierOrderItem = InferInsertModel<typeof supplierOrderItems>;
-
-export type SupplierDelivery = InferSelectModel<typeof supplierDeliveries>;
-export type NewSupplierDelivery = InferInsertModel<typeof supplierDeliveries>;
-
-export type SupplierDeliveryItem = InferSelectModel<typeof supplierDeliveryItems>;
-export type NewSupplierDeliveryItem = InferInsertModel<typeof supplierDeliveryItems>;

@@ -3,15 +3,13 @@ import {
   suppliers,
   supplierOrders,
   supplierOrderItems,
-  supplierDeliveries,
-  supplierDeliveryItems,
 } from '../../database/schema/suppliers';
+import { users } from '../../database/schema/user';
+import { productVariants, products, units } from '../../database/schema/products';
 import type {
   NewSupplier,
   NewSupplierOrder,
   NewSupplierOrderItem,
-  NewSupplierDelivery,
-  NewSupplierDeliveryItem,
 } from '../../database/schema/suppliers';
 import type { Database } from '../../plugins/drizzle';
 
@@ -54,21 +52,56 @@ export class SupplierRepository {
   }
 
   async getAllSupplierOrders() {
-    return this.db.select().from(supplierOrders);
+    return this.db
+      .select({
+        id: supplierOrders.id,
+        supplierId: supplierOrders.supplierId,
+        createdBy: supplierOrders.createdBy,
+        status: supplierOrders.status,
+        orderDate: supplierOrders.orderDate,
+        createdAt: supplierOrders.createdAt,
+        supplierName: suppliers.name,
+        createdByName: users.name,
+      })
+      .from(supplierOrders)
+      .leftJoin(suppliers, eq(suppliers.id, supplierOrders.supplierId))
+      .leftJoin(users, eq(users.id, supplierOrders.createdBy));
   }
 
   async getSupplierOrderById(id: number) {
     const [order] = await this.db
-      .select()
+      .select({
+        id: supplierOrders.id,
+        supplierId: supplierOrders.supplierId,
+        createdBy: supplierOrders.createdBy,
+        status: supplierOrders.status,
+        orderDate: supplierOrders.orderDate,
+        createdAt: supplierOrders.createdAt,
+        supplierName: suppliers.name,
+        createdByName: users.name,
+      })
       .from(supplierOrders)
+      .leftJoin(suppliers, eq(suppliers.id, supplierOrders.supplierId))
+      .leftJoin(users, eq(users.id, supplierOrders.createdBy))
       .where(eq(supplierOrders.id, id));
     return order ?? null;
   }
 
   async getOrdersBySupplierId(supplierId: number) {
     return this.db
-      .select()
+      .select({
+        id: supplierOrders.id,
+        supplierId: supplierOrders.supplierId,
+        createdBy: supplierOrders.createdBy,
+        status: supplierOrders.status,
+        orderDate: supplierOrders.orderDate,
+        createdAt: supplierOrders.createdAt,
+        supplierName: suppliers.name,
+        createdByName: users.name,
+      })
       .from(supplierOrders)
+      .leftJoin(suppliers, eq(suppliers.id, supplierOrders.supplierId))
+      .leftJoin(users, eq(users.id, supplierOrders.createdBy))
       .where(eq(supplierOrders.supplierId, supplierId));
   }
 
@@ -88,38 +121,35 @@ export class SupplierRepository {
     return item;
   }
 
+  async updateSupplierOrderItem(id: number, data: Partial<NewSupplierOrderItem>) {
+    const [updated] = await this.db
+      .update(supplierOrderItems)
+      .set(data)
+      .where(eq(supplierOrderItems.id, id))
+      .returning();
+    return updated;
+  }
+
   async getItemsByOrderId(orderId: number) {
     return this.db
-      .select()
+      .select({
+        id: supplierOrderItems.id,
+        orderId: supplierOrderItems.orderId,
+        variantId: supplierOrderItems.variantId,
+        unitId: supplierOrderItems.unitId,
+        quantity: supplierOrderItems.quantity,
+        price: supplierOrderItems.price,
+        variantName: productVariants.name,
+        qualityLevel: productVariants.qualityLevel,
+        productId: products.id,
+        productName: products.name,
+        unitName: units.name,
+        unitSymbol: units.symbol,
+      })
       .from(supplierOrderItems)
+      .leftJoin(productVariants, eq(productVariants.id, supplierOrderItems.variantId))
+      .leftJoin(products, eq(products.id, productVariants.productId))
+      .leftJoin(units, eq(units.id, supplierOrderItems.unitId))
       .where(eq(supplierOrderItems.orderId, orderId));
-  }
-
-  // ─── Supplier Deliveries ──────────────────────────────────────────────────────
-
-  async createSupplierDelivery(data: NewSupplierDelivery) {
-    const [delivery] = await this.db.insert(supplierDeliveries).values(data).returning();
-    return delivery;
-  }
-
-  async getDeliveriesByOrderId(orderId: number) {
-    return this.db
-      .select()
-      .from(supplierDeliveries)
-      .where(eq(supplierDeliveries.orderId, orderId));
-  }
-
-  // ─── Supplier Delivery Items ───────────────────────────────────────────────────
-
-  async createSupplierDeliveryItem(data: NewSupplierDeliveryItem) {
-    const [item] = await this.db.insert(supplierDeliveryItems).values(data).returning();
-    return item;
-  }
-
-  async getDeliveryItemsByDeliveryId(deliveryId: number) {
-    return this.db
-      .select()
-      .from(supplierDeliveryItems)
-      .where(eq(supplierDeliveryItems.deliveryId, deliveryId));
   }
 }

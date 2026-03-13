@@ -2,7 +2,6 @@ import {
   pgTable,
   serial,
   integer,
-  numeric,
   varchar,
   text,
   timestamp,
@@ -42,7 +41,7 @@ export const expenses = pgTable('expenses', {
     .notNull()
     .references(() => stalls.id, { onDelete: 'restrict' }),
   category: varchar('category', { length: 100 }).notNull(),
-  amount: numeric('amount', { precision: 15, scale: 2 }).notNull(),
+  amount: integer('amount').notNull(),
   description: text('description'),
   createdBy: integer('created_by')
     .notNull()
@@ -64,7 +63,7 @@ export const cashflows = pgTable('cashflows', {
   }),
 
   type: cashflowTypeEnum('type').notNull(),
-  amount: numeric('amount', { precision: 15, scale: 2 }).notNull(),
+  amount: integer('amount').notNull(),
 
   // Polimorfik: tabel asal + ID record asal
   sourceType: cashflowSourceTypeEnum('source_type').notNull(),

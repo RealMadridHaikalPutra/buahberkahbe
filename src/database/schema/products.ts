@@ -4,7 +4,6 @@ import {
   varchar,
   text,
   integer,
-  numeric,
   timestamp,
 } from 'drizzle-orm/pg-core';
 import type { InferSelectModel, InferInsertModel } from 'drizzle-orm';
@@ -52,7 +51,7 @@ export const productPrices = pgTable('product_prices', {
   unitId: integer('unit_id')
     .notNull()
     .references(() => units.id, { onDelete: 'restrict' }),
-  price: numeric('price', { precision: 15, scale: 2 }).notNull(),
+  price: integer('price').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
